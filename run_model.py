@@ -70,7 +70,7 @@ flags.DEFINE_integer('epochs', 2, 'No. of training epochs')
 flags.DEFINE_integer('trajectories', 2, 'No. of training trajectories')
 flags.DEFINE_integer('num_rollouts', 1, 'No. of rollout trajectories')
 
-# core model configuration
+# core model configuration   --architecture configuration
 flags.DEFINE_enum('core_model', 'encode_process_decode',
                   ['encode_process_decode'],
                   'Core model to be used')
@@ -78,7 +78,7 @@ flags.DEFINE_enum('message_passing_aggregator', 'sum', ['sum', 'max', 'min', 'me
 flags.DEFINE_integer('message_passing_steps', 5, 'No. of training epochs')
 flags.DEFINE_boolean('attention', False, 'whether attention is used or not')
 
-# ripple method configuration
+# ripple method configuration   -- mechanism to propagate information faster across the mesh
 '''
 ripple_used defines whether ripple is used, if not, core model of original paper will be used
 
@@ -169,6 +169,7 @@ def add_targets(params):
     loss_type = params['loss_type']
 
     def fn(trajectory):
+      # loss type trajectory of simple step
         if loss_type == 'deform':
             out = {}
             for key, val in trajectory.items():
@@ -178,6 +179,7 @@ def add_targets(params):
                 if key == 'stress':
                     out['target|stress'] = val[1:]
             return out
+      # loss type trajectory of history
         elif loss_type == 'cloth':
             out = {}
             for key, val in trajectory.items():
@@ -189,7 +191,7 @@ def add_targets(params):
             return out
     return fn
 
-
+# in this part, we agregate noise to the model to train it in no ideal cases
 def split_and_preprocess(params, model_type):
     """Splits trajectories into frames, and adds training noise."""
     noise_field = params['field']
@@ -250,6 +252,7 @@ def process_trajectory(trajectory_data, params, model_type, dataset_dir, add_tar
             print(e)
             quit()
     trajectory = {}
+                         
     # decode bytes into corresponding dtypes
     for key, value in trajectory_data.items():
         raw_data = value.numpy().tobytes()
@@ -292,6 +295,7 @@ def learner(model, params, run_step_config):
     model_type = run_step_config['model']
 
     # batch size can be defined in load_dataset. Default to 1.
+    # termine la lectura aqui
     batch_size = 1
     prefetch_factor = 2
 
