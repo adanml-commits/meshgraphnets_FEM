@@ -55,7 +55,7 @@ matplotlib.use('AGG')
 import matplotlib.pyplot as plt
 
 device = torch.device('cuda')
-
+# A Flag contains all configuration values
 # train and evaluation configuration
 FLAGS = flags.FLAGS
 flags.DEFINE_enum('model', 'deform', ['cloth', 'deform'],
@@ -137,6 +137,7 @@ PARAMETERS = {
                   size=3, batch=2, model=deform_model, evaluator=deform_eval, loss_type='deform',
                   stochastic_message_passing_used='False')
 }
+#Solo sera usada la rutina deform
 
 loaded_meta = False
 shapes = {}
