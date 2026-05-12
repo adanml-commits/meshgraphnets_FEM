@@ -295,7 +295,7 @@ def learner(model, params, run_step_config):
     model_type = run_step_config['model']
 
     # batch size can be defined in load_dataset. Default to 1.
-    # termine la lectura aqui
+    
     batch_size = 1
     prefetch_factor = 2
 
@@ -423,6 +423,7 @@ def learner(model, params, run_step_config):
 def loss_fn(loss_type, inputs, network_output, model, params):
     """L2 loss on position."""
     # build target acceleration
+    # this part considers the time/history in the simulation
     if loss_type == 'cloth':
         world_pos = inputs['world_pos']
         prev_world_pos = inputs['prev|world_pos']
@@ -440,6 +441,8 @@ def loss_fn(loss_type, inputs, network_output, model, params):
         error = torch.sum((target_normalized - network_output) ** 2, dim=1)
         loss = torch.mean(error[loss_mask])
         return loss
+
+        # this part muss be deleted if you dont work with the simulation
     elif loss_type == 'deform':
         world_pos = inputs['world_pos']
         target_world_pos = inputs['target|world_pos']
